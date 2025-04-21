@@ -1,0 +1,16 @@
+.card {
+    max-width: 20%;
+    width: auto;
+    height: auto;
+}
+
+.cardLabel {
+    padding-top: 1rem;
+}
+
+.cardContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
