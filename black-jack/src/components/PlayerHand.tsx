@@ -15,26 +15,36 @@ export default function PlayerHand({player}: PlayerHandProps) {
 
     if (player !== undefined && isDealer(player)) {
         return (
-            <div>
+            <div className={styles.cards}>
                 {player.revealed ? (
                     player.hand().map((card, index) => (
                         <DisplayCard key={index} card={card} />
                     ))
                 ) : (
-                    <DisplayCard card={player.hand()[0]} />
+                    player.hand().map((card, index) => (
+                        <DisplayCard key={index} card={index === 0 ? card : undefined} />
+                    ))
                 )}
             </div>
         );
     } else if (player !== undefined) {
         // If it's a Player, render their hand normally
         return (
-            <div>
-                {player.hand().map((card, index) => (
+            <div className={styles.cards}>
+                {player.hand().length > 0 ?
+                (player.hand().map((card, index) => (
                     <DisplayCard key={index} card={card} />
-                ))}
+                ))):
+                <DisplayCard card={player.hand()[0]} />}
             </div>
-    );
+        );
     } else {
-        return <></>;
+        return (
+            <>
+                <p>
+                    no players set :/
+                </p>
+            </>
+        );
     }
 }

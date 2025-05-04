@@ -1,19 +1,19 @@
 import { Card, NumberCard, SpecialCard, AceCard } from "../services/Card";
 import { Players, Dealer } from "../services/Player";
-import { useState, useEffect } from "react";
-import PlayerHand from "../components/PlayerHand";
+import { useEffect, useState } from "react";
+import Board from "../components/Board";
 import styles from "./styles/game.module.css";
+import DisplayCard from "../components/DisplayCard";
 
 type GameProps = {
     numPlayers: number;
-    startGame: boolean;
 }
 
 const suits: string[] = ['C', 'D', 'H', 'S'];
 const special: string[] = ['J', 'Q', 'K'];
 
 
-export default function Game({numPlayers, startGame}: GameProps) {
+export default function Game({numPlayers}: GameProps) {
     const [players, setPlayers] = useState<Players[]>([]);
     const [deck, setDeck] = useState<Card[]>([]);
 
@@ -42,11 +42,10 @@ export default function Game({numPlayers, startGame}: GameProps) {
             });
         }
 
-        return deck;
+        return cards;
     }
 
     const shuffleDeck = (cards: Card[]): Card[] => {
-
         // loop through cards and shuffle possitions
         for (let i = cards.length - 1; i >= 0; i--) {
             let j = Math.floor(Math.random() * i + 1);
@@ -66,49 +65,56 @@ export default function Game({numPlayers, startGame}: GameProps) {
     }
 
     const pickCard = (): Card | undefined => {
-        const cards = deck;
-        const card = cards.pop();
+        let cards = deck;
+        let card = cards.pop();
         setDeck(cards);
         return card;
     }
 
-    const remainingCards = (): number => {
-        return deck.length;
-    }
-
     const newPlayers = (): void => {
         const playersList: Players[] = []
-        for (let i = 0; i < numPlayers - 1; i++) {
+        while (numPlayers > 1) {
             playersList.push(new Players());
+            numPlayers --;
         }
         playersList.push(new Dealer());
+        numPlayers--;
         setPlayers(playersList);
     }
 
-    const addCardToPlayer = (player: Players, card: Card | undefined): void => {
-        player.addCard(card);
+    const updatePlayerCard = (playerIndex: number, card: Card): void => {
+        setPlayers(prevPlayers => {
+            const updated: Players[] = [...prevPlayers];
+            const player: Players = updated[playerIndex]; // clone the player
+            player.cards = [...player.cards, card]; // immutably update cards
+            updated[playerIndex] = player;
+            return updated;
+        });
+    };
+
+    const startGame = (): void => {
+        if (deck.length === 0) newDeck();
+        if (players.length === 0) newPlayers();
     }
 
+    // Optional logging after deck updates
     useEffect(() => {
-        newDeck()
-        newPlayers()
-
-        for (let i = 0; i < 2; i++) {
-            let card: Card | undefined = pickCard();
-            if (card) {
-                addCardToPlayer(players[0], card);
-            }
+        if (deck.length > 0) {
+            console.log("updated deck, number of cards:", deck.length);
         }
+        if (players.length > 0) {
+            console.log("updated player");
+        }
+    }, [deck, players]);
 
-    }, [players, deck])
-
-    if (startGame) {
-        return (
-            <div className={styles.game}>
-                <PlayerHand player={players[0]} />
-            </div>
-        );
-    } else {
-        return <></>
-    }
+    return (
+        <div className={styles.game}>
+            <Board players={players} 
+                cards={deck} 
+                pickCard={pickCard} 
+                updatePlayerCard={updatePlayerCard} 
+                startGame={startGame} 
+            />
+        </div>
+    );
 }

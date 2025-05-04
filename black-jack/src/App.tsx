@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="App">
       {menu ? <StartMenu handleStart={handleStart} players={players} handlePlayers={handlePlayers} /> : 
-      <Game numPlayers={players} startGame={true} />}
+      <Game numPlayers={players} />}
     </div>
   );
 }
