@@ -1,5 +1,5 @@
 import { Card, NumberCard, SpecialCard, AceCard } from "../services/Card";
-import { Players, Dealer } from "../services/Player";
+import { Players, Dealer, PlayerStatus } from "../services/Player";
 import { useEffect, useState } from "react";
 import Board from "../components/Board";
 import styles from "./styles/game.module.css";
@@ -87,10 +87,45 @@ export default function Game({numPlayers}: GameProps) {
             const updated: Players[] = [...prevPlayers];
             const player: Players = updated[playerIndex]; // clone the player
             player.cards = [...player.cards, card]; // immutably update cards
+
+            // if card is an ace
+            if (card.type === 'A') {
+                player.totValue > 10 ?
+                    player.addTotValue(1) :
+                    player.addTotValue(card.value);
+            } else {
+                player.addTotValue(card.value);
+            }
+
+            // if total value is larger than 21
+            player.cards.forEach(card => {
+                if (player.totValue > 21 && card.type === 'A') player.totValue -= 10;
+            })
+
             updated[playerIndex] = player;
             return updated;
         });
     };
+
+    const updatePlayerStatus = (playerIndex: number, status: PlayerStatus): void => {
+        setPlayers(prevPlayers => {
+            const updated: Players[] = [...prevPlayers];
+            const player: Players = updated[playerIndex]; // clone the player
+            player.setStatus(status);
+            updated[playerIndex] = player;
+            return updated;
+        })
+    }
+
+    const revealDealerCard = () : void => {
+        setPlayers(prevPlayers => {
+            const updated: Players[] = [...prevPlayers];
+            const player: Players = updated[players.length - 1]; // clone the player
+            (player as Dealer).releaveHands();
+            updated[players.length - 1] = player;
+            return updated;
+        })
+    }
 
     const startGame = (): void => {
         if (deck.length === 0) newDeck();
@@ -104,6 +139,20 @@ export default function Game({numPlayers}: GameProps) {
         }
         if (players.length > 0) {
             console.log("updated player");
+
+            let dealersTurn = true;
+
+            players.forEach((player, index) => {
+                if (player.getStatus() === PlayerStatus.activ && player.totValue > 21) {
+                    updatePlayerStatus(index, PlayerStatus.busted)
+                } else if (player.getStatus() === PlayerStatus.activ && index < players.length - 1) {
+                    dealersTurn = false;
+                }
+            })
+
+            if (dealersTurn) {
+                revealDealerCard();
+            }
         }
     }, [deck, players]);
 
@@ -114,6 +163,7 @@ export default function Game({numPlayers}: GameProps) {
                 pickCard={pickCard} 
                 updatePlayerCard={updatePlayerCard} 
                 startGame={startGame} 
+                updatePlayerStatus={updatePlayerStatus}
             />
         </div>
     );

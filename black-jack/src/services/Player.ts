@@ -1,25 +1,33 @@
 import { Card } from "./Card";
 
+export enum PlayerStatus {
+    busted,
+    hold,
+    activ,
+}
+
 interface IPlayer {
     cards: Card[];
     totValue: number;
     isDealer: boolean;
+    status: PlayerStatus;
 }
 
 export class Players implements IPlayer {
     cards: Card[];
     totValue: number;
     isDealer: boolean;
+    status: PlayerStatus;
 
     constructor() {
         this.cards = [];
         this.totValue = 0;
         this.isDealer = false;
+        this.status = PlayerStatus.activ;
     }
 
     addCard(card: Card | undefined): void {
         if (card) {
-            this.totValue += card.value;
             this.cards.push(card);
         }
     }
@@ -31,6 +39,18 @@ export class Players implements IPlayer {
 
     hand(): Card[] {
         return this.cards;
+    }
+
+    addTotValue(value: number): void {
+        this.totValue += value;
+    }
+
+    setStatus(status: PlayerStatus): void {
+        this.status = status;
+    }
+
+    getStatus(): PlayerStatus {
+        return this.status;
     }
 }
 

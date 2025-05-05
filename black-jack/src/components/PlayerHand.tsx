@@ -13,38 +13,35 @@ export default function PlayerHand({player}: PlayerHandProps) {
         return (p as Dealer).revealed !== undefined;
     };
 
-    if (player !== undefined && isDealer(player)) {
+    if (player !== undefined && player.hand().length > 0) {
         return (
-            <div className={styles.cards}>
-                {player.revealed ? (
-                    player.hand().map((card, index) => (
-                        <DisplayCard key={index} card={card} />
-                    ))
+            <>
+                {isDealer(player) ? (
+                    <div className={styles.cards}>
+                        {player.revealed ? (
+                            player.hand().map((card, index) => (
+                                <DisplayCard key={index} card={card} />
+                            ))
+                        ) : (
+                            player.hand().map((card, index) => (
+                                <DisplayCard key={index} card={index === 0 ? card : undefined} />
+                            ))
+                        )}
+                    </div>
                 ) : (
-                    player.hand().map((card, index) => (
-                        <DisplayCard key={index} card={index === 0 ? card : undefined} />
-                    ))
+                    <div className={styles.cards}>
+                        {player.hand().map((card, index) => (
+                            <DisplayCard key={index} card={card} />
+                        ))}
+                    </div>
                 )}
-            </div>
-        );
-    } else if (player !== undefined) {
-        // If it's a Player, render their hand normally
-        return (
-            <div className={styles.cards}>
-                {player.hand().length > 0 ?
-                (player.hand().map((card, index) => (
-                    <DisplayCard key={index} card={card} />
-                ))):
-                <DisplayCard card={player.hand()[0]} />}
-            </div>
+            </>
         );
     } else {
         return (
-            <>
-                <p>
-                    no players set :/
-                </p>
-            </>
+            <div className={styles.cards}>
+                <DisplayCard card={undefined} />
+            </div>
         );
     }
 }
