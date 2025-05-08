@@ -7,8 +7,7 @@ function App() {
   const [menu, setMenu] = useState(true);
   const [players, setPlayers] = useState<number>(2);
   
-  const handlePlayers = (event: ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(event.target.value, 10);
+  const handlePlayers = (value: number) => {
       if (!isNaN(value)) {
           if (value >= 2 && value <= 8) {
               setPlayers(value);
@@ -22,7 +21,7 @@ function App() {
 
   return (
     <div className="App">
-      {menu ? <StartMenu handleStart={handleStart} players={players} handlePlayers={handlePlayers} /> : 
+      {menu ? <StartMenu handleStart={handleStart} handlePlayers={handlePlayers} /> : 
       <Game numPlayers={players} />}
     </div>
   );

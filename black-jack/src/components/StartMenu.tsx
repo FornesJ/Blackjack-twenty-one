@@ -1,20 +1,31 @@
-import { ChangeEvent } from "react";
-import styles from "./styles/menu.module.css";
+import { ChangeEvent, useState } from "react";
+import styles from "./styles/components.module.css";
 
 type menuProps = {
     handleStart: () => void,
-    handlePlayers: (event: ChangeEvent<HTMLInputElement>) => void, 
-    players: number,
+    handlePlayers: (value: number) => void, 
 }
 
-export default function StartMenu({handleStart, handlePlayers, players}: menuProps) {
+export default function StartMenu({handleStart, handlePlayers}: menuProps) {
+    const [players, setPlayers] = useState(2);
+
+    const handleSubmit = () => {
+        if (players >= 2 && players <= 8) {
+            handlePlayers(players);
+            handleStart();
+        }
+    }
+
     return (
-        <div className={styles.menu}>
+        <div className={`${styles.menubackground} ${styles.flexcolumn} ${styles.menufont} ${styles.positionfull}`}>
             <h1>BlackJack (Twenty-One)</h1>
-            <form className={styles.menuform}>
-                <label id={styles.labelfield}>Select number of players</label>
-                <input id={styles.inputfield} type="number" value={players} onChange={handlePlayers} />
-                <button id={styles.startbutton} onClick={handleStart}>Start</button>
+            <form className={styles.flexcolumn} onSubmit={handleSubmit}>
+                <label className={styles.formelements} >Select number of players</label>
+                <input className={styles.formelements} 
+                    type="number"
+                    placeholder="2-8 players"
+                    onChange={event => setPlayers(Number(event.target.value))} />
+                <button className={styles.formelements} type="submit">Start</button>
             </form>
         </div>
     );

@@ -2,8 +2,7 @@ import { Card, NumberCard, SpecialCard, AceCard } from "../services/Card";
 import { Players, Dealer, PlayerStatus } from "../services/Player";
 import { useEffect, useState } from "react";
 import Board from "../components/Board";
-import styles from "./styles/game.module.css";
-import DisplayCard from "../components/DisplayCard";
+import styles from "./styles/page.module.css";
 
 type GameProps = {
     numPlayers: number;
@@ -150,7 +149,7 @@ export default function Game({numPlayers}: GameProps) {
                 }
             })
 
-            if (dealersTurn) {
+            if (dealersTurn && !(players[players.length -1] as Dealer).revealed) {
                 revealDealerCard();
             }
         }

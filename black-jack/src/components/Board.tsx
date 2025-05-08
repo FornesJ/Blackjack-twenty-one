@@ -1,9 +1,11 @@
 import PlayerHand from "./PlayerHand";
-import { useEffect, useState } from "react";
-import { Players, Dealer, PlayerStatus } from "../services/Player";
-import { Card, AceCard, NumberCard, SpecialCard } from "../services/Card";
-import styles from "./styles/board.module.css";
+import { useState } from "react";
+import PlayerStatusField from "./PlayerStatus";
+import PlayerController from "./PlayerController";
 import DisplayCard from "./DisplayCard";
+import { Players, Dealer, PlayerStatus } from "../services/Player";
+import { Card } from "../services/Card";
+import styles from "./styles/components.module.css";
 
 type BoardProps = {
     players: Players[],
@@ -41,63 +43,52 @@ export default function Board({players,
     const addFirstCards = (): void => {
         for (let i = 0; i < 2; i++) {
             let card: Card | undefined = pickCard();
-            if (card != undefined) {
+            if (card !== undefined) {
                 updatePlayerCard(playerId, card);
             }
         }
+        // players[playerId].isDealer ? firstPlayer() : nextPlayer();
     }
 
     const addCard = (): void => {
         let card: Card | undefined = pickCard();
-        if (card != undefined) {
+        if (card !== undefined) {
             updatePlayerCard(playerId, card);
         }
     }
 
+    const playerHoldStatus = () => {
+        updatePlayerStatus(playerId, PlayerStatus.hold);
+    }
+
+
     return (
-        <div className={styles.board}>
-            {cards.length === 0 || players.length === 0 || players[playerId].cards.length === 0 ?
-            undefined : (
-                <div className={styles.playerStatus}>
-                    <label>{players[playerId].isDealer ? "Dealer" : "Player: " + playerId}</label>
-                    {players[playerId].isDealer ?
-                    (
-                        <label>Points: {(players[playerId] as Dealer).revealed ? 
-                            players[playerId].totValue : 
-                            players[playerId].hand()[0].value}</label>
-                    ) : (
-                        <label>Points: {players[playerId].totValue}</label>
-                    )}
-                </div>
-            )}
-            {cards.length === 0 && players.length === 0 ? (
-                <DisplayCard card={undefined} />
-            ) : 
+        <div className={styles.flexcolumn}>
+            {cards.length === 0 || players.length === 0 ?
             (
-                <PlayerHand player={players[playerId]} />
+                <div className={`${styles.positiontop} ${styles.flexcolumn}`}>
+                    <h3>Shuffle Deck to Start Game!</h3>
+                </div>
+            ) : (
+                <PlayerStatusField player={players[playerId]} id={playerId}/>
             )}
+
+            {cards.length === 0 && players.length === 0 ? 
+            <DisplayCard card={undefined} /> : 
+            <PlayerHand player={players[playerId]} />}
+
             {cards.length === 0 && players.length === 0 ? (
-                <div className={styles.controlBoard}>
+                <div className={`${styles.positionbottom} ${styles.flexrow}`}>
                     <button onClick={startGame}>Shuffle New Deck</button>
                 </div>
             ) : (
-                <div className={styles.controlBoard}>
-                    {playerId > 0 ?
-                    <button onClick={prevPlayer}>Previous Player</button> :
-                    undefined}
-    
-                    {players[playerId].cards.length > 0 ?
-                        <button onClick={addCard} disabled={players[playerId].getStatus() == PlayerStatus.activ ? false : true}>Hit</button> : 
-                        <button onClick={addFirstCards}>Get cards</button>}
-                    
-                    {players[playerId].cards.length > 0 ?  
-                        <button onClick={() => updatePlayerStatus(playerId, PlayerStatus.hold)}>Hold</button>: 
-                        undefined}
-                        
-                    {playerId < players.length -1 ? 
-                    (<button onClick={nextPlayer}>Next Player</button>) : 
-                    undefined}
-                </div>
+                <PlayerController players={players} 
+                                id={playerId} 
+                                prevPlayer={prevPlayer} 
+                                nextPlayer={nextPlayer} 
+                                addCard={addCard} 
+                                addFirstCards={addFirstCards} 
+                                playerHoldStatus={playerHoldStatus}/>
             )}
         </div>
     );

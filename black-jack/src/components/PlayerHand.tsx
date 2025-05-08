@@ -1,7 +1,6 @@
 import { Dealer, Players } from "../services/Player";
-import { Card } from "../services/Card";
 import DisplayCard from "./DisplayCard";
-import styles from "./styles/hand.module.css";
+import styles from "./styles/components.module.css";
 
 type PlayerHandProps = {
     player: Players | Dealer | undefined;
@@ -17,7 +16,7 @@ export default function PlayerHand({player}: PlayerHandProps) {
         return (
             <>
                 {isDealer(player) ? (
-                    <div className={styles.cards}>
+                    <div className={styles.flexrow}>
                         {player.revealed ? (
                             player.hand().map((card, index) => (
                                 <DisplayCard key={index} card={card} />
@@ -29,7 +28,7 @@ export default function PlayerHand({player}: PlayerHandProps) {
                         )}
                     </div>
                 ) : (
-                    <div className={styles.cards}>
+                    <div className={styles.flexrow}>
                         {player.hand().map((card, index) => (
                             <DisplayCard key={index} card={card} />
                         ))}
@@ -39,7 +38,7 @@ export default function PlayerHand({player}: PlayerHandProps) {
         );
     } else {
         return (
-            <div className={styles.cards}>
+            <div className={styles.flexrow}>
                 <DisplayCard card={undefined} />
             </div>
         );

@@ -1,0 +1,78 @@
+/* background colors */
+.menubackground {
+    background-color: rgba(0, 0, 0, 25%);
+}
+
+
+
+/* flex containers */
+.flexrow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.flexcolumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+/* element positions */
+.positionbottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.positiontop {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.positionfull {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 1em;
+}
+
+
+
+/* fonts and labels */
+.label {
+    font-size: 1rem;
+}
+
+.menufont {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.cardlabel {
+    font-size: 1rem;
+}
+
+
+
+/* spacing */
+.formelements {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.cards {
+    max-width: 100px;
+    width: auto;
+    height: auto;
+}
+
+
+
