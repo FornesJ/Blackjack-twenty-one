@@ -8,6 +8,13 @@ type GameProps = {
     numPlayers: number;
 }
 
+export enum GameStatus {
+    wait,
+    start,
+    active,
+    stop
+}
+
 const suits: string[] = ['C', 'D', 'H', 'S'];
 const special: string[] = ['J', 'Q', 'K'];
 
@@ -15,6 +22,7 @@ const special: string[] = ['J', 'Q', 'K'];
 export default function Game({numPlayers}: GameProps) {
     const [players, setPlayers] = useState<Players[]>([]);
     const [deck, setDeck] = useState<Card[]>([]);
+    const [status, setStatus] = useState<GameStatus>(GameStatus.wait);
 
     const fillDeck = (): Card[] => {
         const cards: Card[] = []; // initialize deck
@@ -129,6 +137,11 @@ export default function Game({numPlayers}: GameProps) {
     const startGame = (): void => {
         if (deck.length === 0) newDeck();
         if (players.length === 0) newPlayers();
+        setStatus(GameStatus.start);
+    }
+
+    const handleGameStatus = (status: GameStatus) => {
+        setStatus(status);
     }
 
     // Optional logging after deck updates
@@ -163,6 +176,8 @@ export default function Game({numPlayers}: GameProps) {
                 updatePlayerCard={updatePlayerCard} 
                 startGame={startGame} 
                 updatePlayerStatus={updatePlayerStatus}
+                gameStatus={status}
+                handleStatus={handleGameStatus}
             />
         </div>
     );
