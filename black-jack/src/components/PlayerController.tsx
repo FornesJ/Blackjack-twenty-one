@@ -46,8 +46,16 @@ export default function PlayerController({players,
                 {id > 0 ?
                 <button onClick={prevPlayer}>Previous Player</button> :
                 undefined}
-                <button onClick={addCard} disabled={players[id].getStatus() === PlayerStatus.activ ? false : true}>Hit</button>
-                <button onClick={playerHoldStatus}>Hold</button>
+                <button 
+                    onClick={addCard} 
+                    disabled={players[id].getStatus() === PlayerStatus.activ ? false : true}
+                >Hit</button>
+                
+                <button 
+                    onClick={playerHoldStatus} 
+                    disabled={players[id].status === PlayerStatus.activ ? false : true}
+                >Hold</button>
+
                 {id < players.length - 1 ? 
                 (<button onClick={nextPlayer}>Next Player</button>) : 
                 undefined}

@@ -7,6 +7,7 @@ import { Players, Dealer, PlayerStatus } from "../services/Player";
 import { Card } from "../services/Card";
 import styles from "./styles/components.module.css";
 import { GameStatus } from "../page/game";
+import { PlayerScoreBoard } from "./PlayerScoreBoard";
 
 type BoardProps = {
     players: Players[],
@@ -88,6 +89,7 @@ export default function Board({players,
                 ) : (
                     <div className={styles.flexcolumn}>
                         <PlayerStatusField player={players[playerId]} id={playerId}/>
+                        <PlayerScoreBoard players={players}/>
                         <PlayerHand player={players[playerId]} />
                         <PlayerController players={players} 
                                 id={playerId} 
