@@ -82,7 +82,7 @@ export default function Board({players,
                             <h3>Shuffle Deck to Start Game!</h3>
                         </div>
                         <DisplayCard card={undefined} />
-                        <div className={`${styles.positionbottom} ${styles.flexrow}`}>
+                        <div className={`${styles.positionbottom} ${styles.flexrow} ${styles.controllers}`}>
                             <button onClick={startGame}>Shuffle New Deck</button>
                         </div>
                     </div>
@@ -90,15 +90,19 @@ export default function Board({players,
                     <div className={styles.flexcolumn}>
                         <PlayerStatusField player={players[playerId]} id={playerId}/>
                         <PlayerScoreBoard players={players}/>
-                        <PlayerHand player={players[playerId]} />
-                        <PlayerController players={players} 
+                        <PlayerHand 
+                                player={players[playerId]} 
+                                addCard={addCard} 
+                                playerHoldStatus={playerHoldStatus}
+                                gameStatus={gameStatus}
+                        />
+                        <PlayerController 
+                                players={players} 
                                 id={playerId} 
                                 prevPlayer={prevPlayer} 
                                 nextPlayer={nextPlayer} 
                                 firstPlayer={firstPlayer}
-                                addCard={addCard} 
                                 addFirstCards={addFirstCards} 
-                                playerHoldStatus={playerHoldStatus}
                                 gameStatus={gameStatus}/>
                     </div>
                 )}

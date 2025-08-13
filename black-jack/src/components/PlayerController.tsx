@@ -8,25 +8,21 @@ type PlayerControllerProps = {
     prevPlayer(): void, 
     nextPlayer(): void,
     firstPlayer(): void, 
-    addCard(): void, 
-    addFirstCards(): void, 
-    playerHoldStatus(): void
-    gameStatus: GameStatus;
+    addFirstCards(): void,
+    gameStatus: GameStatus,
 }
 
 export default function PlayerController({players, 
                                         id, 
                                         prevPlayer, 
                                         nextPlayer,
-                                        firstPlayer, 
-                                        addCard, 
+                                        firstPlayer,  
                                         addFirstCards, 
-                                        playerHoldStatus,
                                         gameStatus}: PlayerControllerProps) {
                                             
     if (gameStatus === GameStatus.start) {
         return (
-            <div className={`${styles.positionbottom} ${styles.flexrow}`}>
+            <div className={`${styles.positionbottom} ${styles.flexrow} ${styles.controllers}`}>
                 {players[id].hand().length === 0 ? 
                 <button onClick={addFirstCards}>Get cards</button> : 
                 <button disabled>Get cards</button>}
@@ -42,19 +38,10 @@ export default function PlayerController({players,
         );
     } else if (gameStatus === GameStatus.active) {
         return (
-            <div className={`${styles.positionbottom} ${styles.flexrow}`}>
+            <div className={`${styles.positionbottom} ${styles.flexrow} ${styles.controllers}`}>
                 {id > 0 ?
                 <button onClick={prevPlayer}>Previous Player</button> :
                 undefined}
-                <button 
-                    onClick={addCard} 
-                    disabled={players[id].getStatus() === PlayerStatus.activ ? false : true}
-                >Hit</button>
-                
-                <button 
-                    onClick={playerHoldStatus} 
-                    disabled={players[id].status === PlayerStatus.activ ? false : true}
-                >Hold</button>
 
                 {id < players.length - 1 ? 
                 (<button onClick={nextPlayer}>Next Player</button>) : 
