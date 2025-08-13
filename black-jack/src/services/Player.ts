@@ -41,8 +41,8 @@ export class Players implements IPlayer {
         return this.cards;
     }
 
-    addTotValue(value: number): void {
-        this.totValue += value;
+    setTotValue(value: number): void {
+        this.totValue = value;
     }
 
     setStatus(status: PlayerStatus): void {

@@ -36,7 +36,15 @@ export class SpecialCard extends Card {
 }
 
 export class AceCard extends Card {
+    reduced: boolean;
+
     constructor(suit: string) {
         super(suit, 'A', 11);
+        this.reduced = false;
+    }
+
+    reduceValue() {
+        this.value = 1;
+        this.reduced = true;
     }
 }

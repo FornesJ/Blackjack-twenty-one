@@ -93,21 +93,25 @@ export default function Game({numPlayers}: GameProps) {
         setPlayers(prevPlayers => {
             const updated: Players[] = [...prevPlayers];
             const player: Players = updated[playerIndex]; // clone the player
-            player.cards = [...player.cards, card]; // immutably update cards
 
             // if card is an ace
-            if (card.type === 'A') {
-                player.totValue > 10 ?
-                    player.addTotValue(1) :
-                    player.addTotValue(card.value);
-            } else {
-                player.addTotValue(card.value);
-            }
+            if (card.type === 'A' && player.totValue > 10) (card as AceCard).reduceValue();
+            player.cards = [...player.cards, card]; // immutably update cards
+            player.setTotValue(player.totValue + card.value);
 
-            // if total value is larger than 21
-            player.cards.forEach(card => {
-                if (player.totValue > 21 && card.type === 'A') player.totValue -= 10;
-            })
+            // check if player has an ace that has not been reduced
+            if (player.totValue > 21) {
+                // update player total value
+                player.cards.forEach(card => {
+                    if (
+                        card.type === 'A' && 
+                        !(card as AceCard).reduced
+                    ) {
+                        (card as AceCard).reduceValue();
+                        player.setTotValue(player.totValue - 10);
+                    }
+                });
+            }
 
             updated[playerIndex] = player;
             return updated;
