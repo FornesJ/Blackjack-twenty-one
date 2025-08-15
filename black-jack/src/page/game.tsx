@@ -95,20 +95,20 @@ export default function Game({numPlayers}: GameProps) {
             const player: Players = updated[playerIndex]; // clone the player
 
             // if card is an ace
-            if (card.type === 'A' && player.totValue > 10) (card as AceCard).reduceValue();
-            player.cards = [...player.cards, card]; // immutably update cards
-            player.setTotValue(player.totValue + card.value);
+            if (card.type === 'A' && player.getTotalValue() > 10) (card as AceCard).reduceValue();
+            player.addCard(card); // immutably update cards
+            player.setTotValue(player.getTotalValue() + card.value);
 
             // check if player has an ace that has not been reduced
-            if (player.totValue > 21) {
+            if (player.getTotalValue() > 21) {
                 // update player total value
-                player.cards.forEach(card => {
+                player.hand().forEach(card => {
                     if (
                         card.type === 'A' && 
                         !(card as AceCard).reduced
                     ) {
                         (card as AceCard).reduceValue();
-                        player.setTotValue(player.totValue - 10);
+                        player.setTotValue(player.getTotalValue() - 10);
                     }
                 });
             }
@@ -159,7 +159,7 @@ export default function Game({numPlayers}: GameProps) {
             let dealersTurn = true;
 
             players.forEach((player, index) => {
-                if (player.getStatus() === PlayerStatus.activ && player.totValue > 21) {
+                if (player.getStatus() === PlayerStatus.activ && player.getTotalValue() > 21) {
                     updatePlayerStatus(index, PlayerStatus.busted)
                 } else if (player.getStatus() === PlayerStatus.activ && index < players.length - 1) {
                     dealersTurn = false;
