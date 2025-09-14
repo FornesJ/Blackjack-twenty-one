@@ -9,23 +9,20 @@ export enum PlayerStatus {
 
 interface IPlayer {
     isDealer: boolean;
-    status: PlayerStatus;
     hands: Hand[];
     currHand: number;
 }
 
 export class Players implements IPlayer {
     isDealer: boolean;
-    status: PlayerStatus;
     hands: Hand[];
     currHand: number;
 
     constructor() {
         this.isDealer = false;
-        this.status = PlayerStatus.activ;
         this.hands = [];
         this.currHand = 0;
-        this.hands.push(new Hand);
+        this.hands.push(new Hand());
     }
 
     addCard(card: Card | undefined): void {
@@ -36,6 +33,14 @@ export class Players implements IPlayer {
 
     removeCards(): void {
         this.hands[this.currHand].removeCards();
+    }
+
+    removeLastCard(): Card | undefined {
+        const card: Card | undefined = this.hands[this.currHand].cards.pop();
+        if (!card) return undefined;
+        const newValue = this.hands[this.currHand].totValue -= card.value;
+        this.hands[this.currHand].setTotValue(newValue);
+        return card;
     }
 
     hand(): Card[] {
@@ -51,15 +56,15 @@ export class Players implements IPlayer {
     }
 
     setStatus(status: PlayerStatus): void {
-        this.status = status;
+        this.hands[this.currHand].setStatus(status);
     }
 
     getStatus(): PlayerStatus {
-        return this.status;
+        return this.hands[this.currHand].getStatus();
     }
 
     addHand(): void {
-        this.hands.push(new Hand);
+        this.hands.push(new Hand());
     }
 
     numberOfHands(): number {
@@ -68,6 +73,10 @@ export class Players implements IPlayer {
 
     changeHand(pos: number): void {
         if (pos > -1 && pos < this.numberOfHands()) this.currHand = pos;
+    }
+
+    getCurrentHand(): Hand {
+        return this.hands[this.currHand];
     }
 }
 

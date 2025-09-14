@@ -17,7 +17,9 @@ type BoardProps = {
     updatePlayerStatus(playerIndex: number, status: PlayerStatus): void,
     startGame(): void,
     gameStatus: GameStatus,
-    handleStatus(status: GameStatus): void
+    handleStatus(status: GameStatus): void,
+    splitPlayerHand(playerIndex: number): void,
+    changePlayerHand(handIndex: number, playerIndex: number): void
 }
 
 export default function Board({players, 
@@ -27,7 +29,9 @@ export default function Board({players,
                             startGame, 
                             updatePlayerStatus,
                             gameStatus,
-                            handleStatus
+                            handleStatus,
+                            splitPlayerHand,
+                            changePlayerHand
                         }: BoardProps) {
     const [playerId, setPlayerId] = useState(0);
 
@@ -73,6 +77,14 @@ export default function Board({players,
         updatePlayerStatus(playerId, PlayerStatus.hold);
     }
 
+    const handleSplit = (): void => {
+        splitPlayerHand(playerId);
+    }
+
+    const handleHand = (handIndex: number): void => {
+        changePlayerHand(handIndex, playerId);
+    }
+
     return (
         <>
             {gameStatus === GameStatus.wait ?
@@ -95,6 +107,8 @@ export default function Board({players,
                                 addCard={addCard} 
                                 playerHoldStatus={playerHoldStatus}
                                 gameStatus={gameStatus}
+                                handleSplit={handleSplit}
+                                handleHand={handleHand}
                         />
                         <PlayerController 
                                 players={players} 

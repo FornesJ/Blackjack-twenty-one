@@ -8,9 +8,11 @@ type PlayerHandProps = {
     addCard(): void;
     playerHoldStatus(): void;
     gameStatus: GameStatus;
+    handleSplit(): void;
+    handleHand(handIndex: number): void;
 }
 
-export default function PlayerHand({player, addCard, playerHoldStatus, gameStatus}: PlayerHandProps) {
+export default function PlayerHand({player, addCard, playerHoldStatus, gameStatus, handleSplit, handleHand}: PlayerHandProps) {
     // Check if player is a Dealer using a type guard, not instanceof
     const isDealer = (p: Players | Dealer ): p is Dealer => {
         return (p as Dealer).revealed !== undefined;
@@ -40,15 +42,34 @@ export default function PlayerHand({player, addCard, playerHoldStatus, gameStatu
                 )}
                 {gameStatus === GameStatus.active ? (
                     <div className={`${styles.flexrow} ${styles.controllers}`}>
+                        {player.currHand > 0 ? (
+                            <button
+                                onClick={() => handleHand(player.currHand - 1)}
+                            >Previous Hand</button>
+                        ) : undefined}
+
                         <button 
                             onClick={addCard} 
                             disabled={player.getStatus() === PlayerStatus.activ ? false : true}
                         >Hit</button>
-                        
+
+                        { player.getCurrentHand().getSplit() ? (
+                            <button
+                                onClick={handleSplit}
+                                disabled={player.getStatus() === PlayerStatus.activ ? false : true}
+                            >Split</button>
+                        ) : undefined }
+
                         <button 
                             onClick={playerHoldStatus} 
-                            disabled={player.status === PlayerStatus.activ ? false : true}
+                            disabled={player.getStatus() === PlayerStatus.activ ? false : true}
                         >Hold</button>
+
+                        {player.currHand < player.numberOfHands() - 1 ? (
+                            <button
+                                onClick={() => handleHand(player.currHand + 1)}
+                            >Next Hand</button>
+                        ) : undefined}
                     </div>
                 ) : undefined}
             </div>
