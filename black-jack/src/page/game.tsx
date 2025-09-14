@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Board from "../components/Board";
 import styles from "./styles/page.module.css";
 import { Hand } from "../services/Hand";
+import { GameMenu } from "../components/GameMenu";
 
 type GameProps = {
     numPlayers: number;
@@ -24,6 +25,7 @@ export default function Game({numPlayers}: GameProps) {
     const [players, setPlayers] = useState<Players[]>([]);
     const [deck, setDeck] = useState<Card[]>([]);
     const [status, setStatus] = useState<GameStatus>(GameStatus.wait);
+    const [winnerId, setWinnerId] = useState(-1);
 
     const fillDeck = (): Card[] => {
         const cards: Card[] = []; // initialize deck
@@ -94,6 +96,10 @@ export default function Game({numPlayers}: GameProps) {
         setPlayers(prevPlayers => {
             const updated: Players[] = [...prevPlayers];
             const player: Players = updated[playerIndex]; // clone the player
+
+            if (player.getCurrentHand().getSplit()) {
+                player.getCurrentHand().setSplit();
+            }
 
             // check if player can split
             player.hand().map((c: Card) => {
@@ -197,6 +203,19 @@ export default function Game({numPlayers}: GameProps) {
         setStatus(status);
     }
 
+    const getWinner = (): void => {
+        let newWinner: Players;
+        let points = 0;
+
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].getTotalValue() >= points && players[i].getStatus() !== PlayerStatus.busted) {
+                newWinner = players[i];
+                points = newWinner.getTotalValue();
+                setWinnerId(i);
+            }
+        }
+    }
+
     // Optional logging after deck updates
     useEffect(() => {
         if (deck.length > 0) {
@@ -217,10 +236,15 @@ export default function Game({numPlayers}: GameProps) {
                 if (player.getStatus() === PlayerStatus.activ && index < players.length - 1) {
                     dealersTurn = false;
                 }
+
+                if (dealersTurn && players[players.length -1].getStatus() !== PlayerStatus.activ) {
+                    handleGameStatus(GameStatus.stop);
+                }
             })
 
             if (dealersTurn && !(players[players.length -1] as Dealer).revealed) {
                 revealDealerCard();
+                getWinner();
             }
         }
     }, [deck, players]);
@@ -238,6 +262,7 @@ export default function Game({numPlayers}: GameProps) {
                 splitPlayerHand={splitPlayerHand}
                 changePlayerHand={changePlayerHand}
             />
+            {status === GameStatus.stop ? <GameMenu players={players} winner={winnerId} /> : undefined}
         </div>
     );
 }
