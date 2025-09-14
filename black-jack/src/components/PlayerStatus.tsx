@@ -1,5 +1,5 @@
 import styles from "./styles/components.module.css";
-import { Players, Dealer } from "../services/Player";
+import { Players, Dealer, PlayerStatus } from "../services/Player";
 
 type PlayerStatusFieldProp = {
     player: Players,
@@ -9,18 +9,22 @@ type PlayerStatusFieldProp = {
 
 
 export default function PlayerStatusField({player, id}: PlayerStatusFieldProp) {
+    const printStatus = (status: PlayerStatus) => {
+            let str: string;
+        
+            status === PlayerStatus.hold ? str = "Hold" : (
+                status === PlayerStatus.busted ? str = "Busted" :
+                str = "Active"
+            );
+        
+            return str;
+        };
+        
     return (
         <div className={`${styles.positiontop} ${styles.flexcolumn}`}>
             <label>{player.isDealer ? "Dealer" : "Player: " + Number(id + 1)}</label>
-            {player.isDealer ?
-            (
-                <label>Points: {(player as Dealer).revealed ? 
-                    player.totValue : 
-                    player.hand().length > 0 ? player.hand()[0].value : 0}
-                </label>
-            ) : (
-                <label>Points: {player.totValue}</label>
-            )}
+            <label>Points: {player.getTotalValue()}</label>
+            <label>Status: {printStatus(player.getStatus())}</label>
         </div>
     );
 }

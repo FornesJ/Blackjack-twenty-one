@@ -3,6 +3,7 @@ import { Players, Dealer, PlayerStatus } from "../services/Player";
 import { useEffect, useState } from "react";
 import Board from "../components/Board";
 import styles from "./styles/page.module.css";
+import { Hand } from "../services/Hand";
 
 type GameProps = {
     numPlayers: number;
@@ -94,24 +95,33 @@ export default function Game({numPlayers}: GameProps) {
             const updated: Players[] = [...prevPlayers];
             const player: Players = updated[playerIndex]; // clone the player
 
+            // check if player can split
+            player.hand().map((c: Card) => {
+                if (card.type === c.type) {
+                    const currHand: Hand = player.getCurrentHand();
+                    if (!currHand.getSplit()) currHand.setSplit();
+                }
+            })
+
             // if card is an ace
-            if (card.type === 'A' && player.totValue > 10) (card as AceCard).reduceValue();
-            player.cards = [...player.cards, card]; // immutably update cards
-            player.setTotValue(player.totValue + card.value);
+            if (card.type === 'A' && player.getTotalValue() > 10) (card as AceCard).reduceValue();
+            player.addCard(card); // immutably update cards
+            player.setTotValue(player.getTotalValue() + card.value);
 
             // check if player has an ace that has not been reduced
-            if (player.totValue > 21) {
+            if (player.getTotalValue() > 21) {
                 // update player total value
-                player.cards.forEach(card => {
+                player.hand().forEach(card => {
                     if (
                         card.type === 'A' && 
                         !(card as AceCard).reduced
                     ) {
                         (card as AceCard).reduceValue();
-                        player.setTotValue(player.totValue - 10);
+                        player.setTotValue(player.getTotalValue() - 10);
                     }
                 });
             }
+
 
             updated[playerIndex] = player;
             return updated;
@@ -126,6 +136,45 @@ export default function Game({numPlayers}: GameProps) {
             updated[playerIndex] = player;
             return updated;
         })
+    }
+
+    const splitPlayerHand = (playerIndex: number): void =>{
+        setPlayers(prevPlayers => {
+            const updated: Players[] = [...prevPlayers];
+            const player: Players = updated[playerIndex]; // clone the player
+
+            const splitCard = player.removeLastCard();
+
+            if (splitCard?.type === 'A') {
+                if ((splitCard as AceCard).reduced) {
+                    (splitCard as AceCard).reduced = false;
+                    (splitCard as AceCard).value = 11;
+                }
+            }
+
+            if (splitCard) {
+                player.getCurrentHand().setSplit();
+                player.addHand()
+                player.changeHand(player.currHand + 1);
+                player.addCard(splitCard); // immutably update cards
+                player.setTotValue(player.getTotalValue() + splitCard.value);
+                updated[playerIndex] = player
+            }
+
+            return updated;
+        })
+    }
+
+    const changePlayerHand = (handIndex: number, playerIndex: number): void => {
+        if (handIndex < players[playerIndex].hands.length && handIndex > -1) {
+            setPlayers(prevPlayers => {
+                const updated: Players[] = [...prevPlayers];
+                const player: Players = updated[playerIndex]; // clone the player
+                player.changeHand(handIndex);
+                updated[playerIndex] = player;
+                return updated;
+            })
+        }
     }
 
     const revealDealerCard = () : void => {
@@ -159,9 +208,13 @@ export default function Game({numPlayers}: GameProps) {
             let dealersTurn = true;
 
             players.forEach((player, index) => {
-                if (player.getStatus() === PlayerStatus.activ && player.totValue > 21) {
+                // check if player has busted
+                if (player.getStatus() === PlayerStatus.activ && player.getTotalValue() > 21) {
                     updatePlayerStatus(index, PlayerStatus.busted)
-                } else if (player.getStatus() === PlayerStatus.activ && index < players.length - 1) {
+                } 
+                
+                // check if its the dealers turn
+                if (player.getStatus() === PlayerStatus.activ && index < players.length - 1) {
                     dealersTurn = false;
                 }
             })
@@ -182,6 +235,8 @@ export default function Game({numPlayers}: GameProps) {
                 updatePlayerStatus={updatePlayerStatus}
                 gameStatus={status}
                 handleStatus={handleGameStatus}
+                splitPlayerHand={splitPlayerHand}
+                changePlayerHand={changePlayerHand}
             />
         </div>
     );

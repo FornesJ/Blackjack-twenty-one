@@ -1,4 +1,5 @@
 import { Card } from "./Card";
+import { Hand } from "./Hand";
 
 export enum PlayerStatus {
     busted,
@@ -7,50 +8,75 @@ export enum PlayerStatus {
 }
 
 interface IPlayer {
-    cards: Card[];
-    totValue: number;
     isDealer: boolean;
-    status: PlayerStatus;
+    hands: Hand[];
+    currHand: number;
 }
 
 export class Players implements IPlayer {
-    cards: Card[];
-    totValue: number;
     isDealer: boolean;
-    status: PlayerStatus;
+    hands: Hand[];
+    currHand: number;
 
     constructor() {
-        this.cards = [];
-        this.totValue = 0;
         this.isDealer = false;
-        this.status = PlayerStatus.activ;
+        this.hands = [];
+        this.currHand = 0;
+        this.hands.push(new Hand());
     }
 
     addCard(card: Card | undefined): void {
         if (card) {
-            this.cards.push(card);
+            this.hands[this.currHand].addCard(card);
         }
     }
 
     removeCards(): void {
-        this.cards = [];
-        this.totValue = 0;
+        this.hands[this.currHand].removeCards();
+    }
+
+    removeLastCard(): Card | undefined {
+        const card: Card | undefined = this.hands[this.currHand].cards.pop();
+        if (!card) return undefined;
+        const newValue = this.hands[this.currHand].totValue -= card.value;
+        this.hands[this.currHand].setTotValue(newValue);
+        return card;
     }
 
     hand(): Card[] {
-        return this.cards;
+        return this.hands[this.currHand].hand();
     }
 
     setTotValue(value: number): void {
-        this.totValue = value;
+        this.hands[this.currHand].setTotValue(value);
+    }
+
+    getTotalValue(): number {
+        return this.hands[this.currHand].totValue;
     }
 
     setStatus(status: PlayerStatus): void {
-        this.status = status;
+        this.hands[this.currHand].setStatus(status);
     }
 
     getStatus(): PlayerStatus {
-        return this.status;
+        return this.hands[this.currHand].getStatus();
+    }
+
+    addHand(): void {
+        this.hands.push(new Hand());
+    }
+
+    numberOfHands(): number {
+        return this.hands.length;
+    }
+
+    changeHand(pos: number): void {
+        if (pos > -1 && pos < this.numberOfHands()) this.currHand = pos;
+    }
+
+    getCurrentHand(): Hand {
+        return this.hands[this.currHand];
     }
 }
 
@@ -65,4 +91,11 @@ export class Dealer extends Players {
     releaveHands(): void {
         this.revealed = true;
     }
+
+    getTotalValue(): number {
+        return this.revealed ? 
+            this.hands[this.currHand].totValue : 
+            (this.hands[this.currHand].hand().length > 0) ? 
+            this.hands[this.currHand].hand()[0].value : 0;
+    }        
 }

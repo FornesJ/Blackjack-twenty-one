@@ -17,12 +17,6 @@ export const PlayerScoreBoard = ({players}: PlayerScoreBoardProps) => {
         return str;
     };
 
-    const dealerPoints = (dealer: Dealer) => {
-        if (dealer.revealed) return dealer.totValue;
-        if (dealer.cards.length > 0) return dealer.cards[0].value;
-        return 0;
-    };
-
     return (
         <table className={`${styles.positiontopleft} ${styles.leaderboard}`}>
             <tr className={styles.tablehead}>
@@ -33,7 +27,7 @@ export const PlayerScoreBoard = ({players}: PlayerScoreBoardProps) => {
             {players.map(( player: Players) => (
                 <tr>
                     <td>{player.isDealer ? "Dealer" : `Player ${players.indexOf(player) + 1}`}</td>
-                    <td>{player.isDealer ? dealerPoints(player as Dealer) : player.totValue}</td>
+                    <td>{player.getTotalValue()}</td>
                     <td>{printStatus(player.getStatus())}</td>
                 </tr>
             ))}
